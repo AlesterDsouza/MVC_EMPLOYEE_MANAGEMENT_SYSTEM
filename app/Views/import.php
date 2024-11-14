@@ -215,6 +215,8 @@
 </head>
 <body>
 
+<?php include 'header1.php'; ?>
+
 <div class="container">
 
     <!-- CSV Upload Section -->
@@ -229,6 +231,8 @@
     </div>
 
 </div>
+
+<?php include 'footer1.php'; ?>
 
 </body>
 </html>

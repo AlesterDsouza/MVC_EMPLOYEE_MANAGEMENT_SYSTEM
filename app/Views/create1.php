@@ -24,7 +24,7 @@ if (isset($_POST['submit'])) {
     // Move uploaded file to uploads directory
     if (!empty($_FILES['ProfilePic']['name'])) {
         $profilePic = time() . '_' . $_FILES['ProfilePic']['name'];
-        if (!move_uploaded_file($_FILES['ProfilePic']['tmp_name'], 'uploads/' . $profilePic)) {
+        if (!move_uploaded_file($_FILES['ProfilePic']['tmp_name'], '/ ../uploads/' . $profilePic)) {
             echo "<div class='alert alert-danger'>Failed to upload file.</div>";
             die();
         }

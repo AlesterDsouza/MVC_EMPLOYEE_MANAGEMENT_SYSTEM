@@ -1,34 +1,9 @@
-
-
-<?php
-session_start();
-require_once __DIR__ . '/../Models/User1.php';
-
-// Initialize User1 object
-$user = new User1();
-
-// Search and pagination handling
-$search = isset($_GET['search']) ? $_GET['search'] : '';
-$limit = 5;
-$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-$offset = ($page - 1) * $limit;
-
-// Fetch users and total count based on search and pagination
-$total_users = $user->countUsers($search);
-$total_pages = ceil($total_users / $limit);
-$users = $user->fetchUsers($search, $limit, $offset);
-?>
-
-<?php include 'header.php'; ?>
-
-<div class="container">
-    <form method="GET" action="">
-        <input type="text" name="search" value="<?php echo htmlspecialchars($search); ?>" placeholder="Search" autocomplete="off">
-        <button type="submit">Search</button>
-    </form>
-
-    <h2>User List</h2>
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard</title>
     <link rel="stylesheet" href="styles.css">
     <style>
 
@@ -291,68 +266,16 @@ button:disabled {
     font-weight: bold;
 }
 </style>
-    <a href="create1.php" class="btn">Create User</a>
-    <a href="../../public/index.php" class="btn">Logout</a>
 
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>First Name</th>
-                <th>Last Name</th>
-                <th>Mobile Number</th>
-                <th>Email</th>
-                <th>Address</th>
-                <th>Profile Picture</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php if (count($users) > 0): ?>
-                <?php foreach ($users as $user): ?>
-                <tr>
-                    <td><?php echo htmlspecialchars($user['ID']); ?></td>
-                    <td><?php echo htmlspecialchars($user['FirstName']); ?></td>
-                    <td><?php echo htmlspecialchars($user['LastName']); ?></td>
-                    <td><?php echo htmlspecialchars($user['MobileNumber']); ?></td>
-                    <td><?php echo htmlspecialchars($user['Email']); ?></td>
-                    <td><?php echo htmlspecialchars($user['Address']); ?></td>
-                    <td>
-                        <?php if (!empty($user['ProfilePic'])): ?>
-                            <img src="uploads/<?php echo htmlspecialchars($user['ProfilePic']); ?>" alt="Profile Picture" width="50">
-                        <?php else: ?>
-                            No Image
-                        <?php endif; ?>
-                    </td>
-                    <td>
-                        <a href="edit1.php?id=<?php echo $user['ID']; ?>">Edit</a> |
-                        <a href="delete1.php?delete1=<?php echo $user['ID']; ?>" onclick="return confirm('Are you sure you want to delete this user?');">Delete</a>
-                    </td>
-                </tr>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <tr>
-                    <td colspan="8">No users found.</td>
-                </tr>
-            <?php endif; ?>
-        </tbody>
-    </table>
-
-    <div class="pagination">
-        <?php if ($page > 1): ?>
-            <a href="?page=<?php echo $page - 1; ?>&search=<?php echo htmlspecialchars($search); ?>">Previous</a>
-        <?php endif; ?>
-
-        <?php for ($i = 1; $i <= $total_pages; $i++): ?>
-            <a href="?page=<?php echo $i; ?>&search=<?php echo htmlspecialchars($search); ?>" <?php if ($i == $page) echo 'style="font-weight: bold;"'; ?>>
-                <?php echo $i; ?>
-            </a>
-        <?php endfor; ?>
-
-        <?php if ($page < $total_pages): ?>
-            <a href="?page=<?php echo $page + 1; ?>&search=<?php echo htmlspecialchars($search); ?>">Next</a>
-        <?php endif; ?>
-    </div>
-</div>
-
-<?php include 'footer.php'; ?>
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="user_list1.php">Home</a></li>
+                <li><a href="import.php">Import</a></li>
+            </ul>
+        </nav>
+        <h1>Welcome to the import page</h1>
+    </header>
+    <main>
