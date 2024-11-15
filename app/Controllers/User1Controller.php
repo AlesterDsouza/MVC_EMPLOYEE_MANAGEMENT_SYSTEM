@@ -6,6 +6,9 @@ require_once __DIR__ . '/../Models/User1.php';
 $controller = new User1Controller();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_GET['action']) && $_GET['action'] === 'create1') {
+
+    // echo 'Hello';
+    // exit;
     $controller->createUser($_POST);
 }
 
@@ -31,12 +34,15 @@ class User1Controller {
 
     public function __construct() {
         $this->user1Model = new User1();
-        session_start();
+        // session_start();
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
     }
 
     public function listUsers() {
         // Redirect if not logged in
-        if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+        if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
             header('Location: ../public/login.php');
             exit();
         }
@@ -49,11 +55,22 @@ class User1Controller {
         $total_users = $this->user1Model->countUsers($search);
         $total_pages = ceil($total_users / $limit);
         $users = $this->user1Model->fetchUsers($search, $limit, $offset);
+
+        //   // Store users in session for the view
+        //   $_SESSION['users'] = $users;
+
+        require_once __DIR__ . '/../Views/user_list1.php';
         
-        require_once '../app/Views/user_list1.php';
+        // require_once '../app/Views/user_list1.php';
+        // header("Location: ../Views/user_list1.php");
+        // exit();
     }
  
     public function createUser($userData) {
+        // public function createUser($_POST) {
+
+        // echo 'Hello';
+        // exit;
         // if ($this->user1Model->rollNoExists($userData['RollNo'])) {
         //     echo "Error: Roll number already exists!";
         //     return;
@@ -64,18 +81,46 @@ class User1Controller {
             $mobileNumber = $_POST['MobileNumber'];
             $email = $_POST['Email'];
             $address = $_POST['Address'];
+
+            // $firstName = $userData['FirstName'];
+            // $lastName = $userData['LastName'];
+            // $mobileNumber = $userData['MobileNumber'];
+            // $email = $userData['Email'];
+            // $address = $userData['Address'];
         
             // Initialize profile picture variable
             $profilePic = null;
         
+            // // Move uploaded file to uploads directory
+            // if (!empty($_FILES['ProfilePic']['name'])) {
+            //     $profilePic = time() . '_' . $_FILES['ProfilePic']['name'];
+            //     if (!move_uploaded_file($_FILES['ProfilePic']['tmp_name'], 'uploads/' . $profilePic)) {
+            //         echo "<div class='alert alert-danger'>Failed to upload file.</div>";
+            //         die();
+            //     }
+            // }
+
+            // if (!empty($_FILES['ProfilePic']['name'])) {
+            //     $profilePic = time() . '_' . $_FILES['ProfilePic']['name'];
+            //     $uploadPath = __DIR__ . '/../uploads/' . $profilePic;
+            
+            //     if (!move_uploaded_file($_FILES['ProfilePic']['tmp_name'], $uploadPath)) {
+            //         echo "<div class='alert alert-danger'>Failed to upload file.</div>";
+            //         die();
+            //     }
+            // }
+
+            $uploadDir = __DIR__ . '/../../uploads/';
+
             // Move uploaded file to uploads directory
             if (!empty($_FILES['ProfilePic']['name'])) {
                 $profilePic = time() . '_' . $_FILES['ProfilePic']['name'];
-                if (!move_uploaded_file($_FILES['ProfilePic']['tmp_name'], 'uploads/' . $profilePic)) {
+                if (!move_uploaded_file($_FILES['ProfilePic']['tmp_name'], $uploadDir . $profilePic)) {
                     echo "<div class='alert alert-danger'>Failed to upload file.</div>";
                     die();
                 }
             }
+        
         
             $user = new User1();
         
@@ -84,9 +129,11 @@ class User1Controller {
             } elseif ($user->emailExists($email)) {
                 echo "<div class='alert alert-danger'>Email already exists. Please use a different one.</div>";
             } else {
+                // echo 'Hello';
+                // exit;
                 $user->create1($firstName, $lastName, $mobileNumber, $email, $address, $profilePic);
                 echo "<div class='alert alert-success'>User created successfully!</div>";
-                header('Location: User_list1.php');
+                header('Location:  ../Views/user_list1.php');
                 exit();
             }
         }
@@ -106,6 +153,19 @@ class User1Controller {
         
     //     header('Location: ../Views/user_list1.php');
     // }
+
+ 
+    
+        public function deleteUsers($userIds) {
+            $userObj = new User1();
+            foreach ($userIds as $id) {
+                $userObj->deleteUser($id);
+            }
+            header("Location: user_list1.php");
+            exit();
+        }
+    
+    
 
 
 
@@ -216,8 +276,11 @@ if (isset($_POST['submit'])) {
     $profilePic = $existingUser['ProfilePic']; // Keep existing profile pic if no new one is uploaded
     if ($_FILES['ProfilePic']['name']) {
         $profilePic = time() . '_' . $_FILES['ProfilePic']['name'];
-        move_uploaded_file($_FILES['ProfilePic']['tmp_name'], 'uploads/' . $profilePic);
+        move_uploaded_file($_FILES['ProfilePic']['tmp_name'], '../public/uploads/' . $profilePic);
     }
+
+
+ 
 
     // Update user information
     if ($user->update1($id, $firstName, $lastName, $mobileNumber, $email, $address, $profilePic)) {

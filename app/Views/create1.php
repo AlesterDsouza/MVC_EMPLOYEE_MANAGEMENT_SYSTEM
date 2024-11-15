@@ -1,15 +1,14 @@
 <?php
 session_start(); // Start the session
 
-// require_once 'User1.php';
 require_once __DIR__ . '/../Models/User1.php';
 
 // Check if the user is logged in
+if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
+    header("Location: ../../index.php");
+    exit();
+}
 
-// if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true){
-//     header('Location: login.php');
-//     exit;
-// }
 
 if (isset($_POST['submit'])) {
     $firstName = $_POST['FirstName'];
@@ -21,14 +20,37 @@ if (isset($_POST['submit'])) {
     // Initialize profile picture variable
     $profilePic = null;
 
+    // Directory for file uploads
+    $uploadDir = __DIR__ . '/../../uploads/';
+
     // Move uploaded file to uploads directory
     if (!empty($_FILES['ProfilePic']['name'])) {
         $profilePic = time() . '_' . $_FILES['ProfilePic']['name'];
-        if (!move_uploaded_file($_FILES['ProfilePic']['tmp_name'], '/ ../uploads/' . $profilePic)) {
+        if (!move_uploaded_file($_FILES['ProfilePic']['tmp_name'], $uploadDir . $profilePic)) {
             echo "<div class='alert alert-danger'>Failed to upload file.</div>";
             die();
         }
     }
+
+    // if (!move_uploaded_file($_FILES['ProfilePic']['tmp_name'], __DIR__ . '/../uploads/' . $profilePic)) {
+
+
+    //     sudo chmod -R 755 /path/to/uploads
+    //     sudo chown -R www-data:www-data /path/to/uploads
+             
+        
+    //     After making these changes, your code should look like this:
+        
+    //     if (!empty($_FILES['ProfilePic']['name'])) {
+    //         $profilePic = time() . '_' . $_FILES['ProfilePic']['name'];
+    //         $uploadPath = __DIR__ . '/../uploads/' . $profilePic;
+        
+    //         if (!move_uploaded_file($_FILES['ProfilePic']['tmp_name'], $uploadPath)) {
+    //             echo "<div class='alert alert-danger'>Failed to upload file.</div>";
+    //             die();
+    //         }
+    //     }
+        
 
     $user = new User1();
 
@@ -39,7 +61,7 @@ if (isset($_POST['submit'])) {
     } else {
         $user->create1($firstName, $lastName, $mobileNumber, $email, $address, $profilePic);
         echo "<div class='alert alert-success'>User created successfully!</div>";
-        header('Location: User_list1.php');
+        header('Location: user_list1.php');
         exit();
     }
 }
@@ -59,7 +81,8 @@ $existingImage = false;
 <div class="container">
     <div class="form-container">
         <h2 class="text-center">Create New User</h2>
-        <form action="create1.php" method="post" enctype="multipart/form-data" autocomplete="off">
+        <!-- <form action="create1.php" method="post" enctype="multipart/form-data" autocomplete="off"> -->
+        <form action="../Controllers/User1Controller.php?action=create1" method="post" enctype="multipart/form-data" autocomplete="off" id="createUserForm">
             <div class="form-group">
                 <label for="FirstName">First Name</label>
                 <input type="text" class="form-control" id="FirstName" name="FirstName" required>
@@ -92,7 +115,7 @@ $existingImage = false;
 
             <div class="form-group">
                 <label for="ProfilePic">Profile Picture</label>
-                <input type="file" class="form-control-file" id="ProfilePic" name="ProfilePic" accept=".jpg, .png" onchange="validateImage()" required>
+                <input type="file" class="form-control-file" id="ProfilePic" name="ProfilePic" accept=".jpg, .png" required>
                 <div id="image-error" class="error-message"></div>
             </div>
 
@@ -354,7 +377,6 @@ function validateAllFields() {
             validateImage();
             checkSubmitButton();
         }
-</script>
-</script>
+</script>    
 </body>
 </html>

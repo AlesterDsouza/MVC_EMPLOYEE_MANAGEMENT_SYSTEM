@@ -17,7 +17,7 @@ class LoginController {
         $invalid = 0;
 
         if ($username === Admin::USERNAME && $password === Admin::PASSWORD) {
-            $_SESSION['is_logged_in'] = true;
+            $_SESSION['logged_in'] = true;
              header('Location: ../app/Views/user_list1.php');
             // require_once '../app/Views/user_list.php';
             exit();
