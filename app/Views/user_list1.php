@@ -31,12 +31,25 @@ $users = $userObj->fetchUsers($search, $limit, $offset);
 <?php include 'header.php'; ?>
 
 <div class="container">
+
+    <!-- Display messages -->
+    <?php if (isset($_SESSION['error_message'])): ?>
+        <div class="error-message">
+            <?php echo $_SESSION['error_message']; unset($_SESSION['error_message']); ?>
+        </div>
+    <?php elseif (isset($_SESSION['success_message'])): ?>
+        <div class="success-message">
+            <?php echo $_SESSION['success_message']; unset($_SESSION['success_message']); ?>
+        </div>
+    <?php endif; ?>
+
+
     <form method="GET" action="">
         <input type="text" name="search" value="<?php echo htmlspecialchars($search); ?>" placeholder="Search" autocomplete="off">
         <button type="submit">Search</button>
     </form>
 
-    <h2>User List</h2>
+    <!-- <h2>User List</h2> -->
 
     <link rel="stylesheet" href="styles.css">
 <style>
@@ -303,38 +316,40 @@ button:disabled {
     <a href="create1.php" class="btn">Create User</a>
     <a href="../../public/index.php" class="btn">Logout</a>
 
-    <form method="POST" action="delete1.php">
-        <table>
-            <thead>
-                <tr>
-                    <th><input type="checkbox" id="select-all"></th>
-                    <th>ID</th>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                    <th>Mobile Number</th>
-                    <th>Email</th>
-                    <th>Address</th>
-                    <th>Profile Picture</th>
-                    <th>Actions</th>
+
+                <form id="deleteForm" method="POST" action="../Controllers/User1Controller.php?action=mass_delete">
+                    <table border="1">
+                        <thead>
+                            <tr>
+
+                <th><input type="checkbox" id="select-all"></th>    
+                <th>ID</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Mobile Number</th>
+                <th>Email</th>
+                <th>Address</th>
+                <th>Profile Picture</th>
+                <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 <?php if (count($users) > 0): ?>
                     <?php foreach ($users as $user): ?>
                         <tr>
-                            <td><input type="checkbox" name="selected_users[]" value="<?php echo $user['ID']; ?>"></td>
-                            <td><?php echo htmlspecialchars($user['ID']); ?></td>
-                            <td><?php echo htmlspecialchars($user['FirstName']); ?></td>
-                            <td><?php echo htmlspecialchars($user['LastName']); ?></td>
-                            <td><?php echo htmlspecialchars($user['MobileNumber']); ?></td>
-                            <td><?php echo htmlspecialchars($user['Email']); ?></td>
-                            <td><?php echo htmlspecialchars($user['Address']); ?></td>
-                            <td>
-                                <?php if (!empty($user['ProfilePic'])): ?>
-                                    <img src="uploads/<?php echo htmlspecialchars($user['ProfilePic']); ?>" alt="Profile Picture" width="50">
-                                <?php else: ?>
-                                    No Image
-                                <?php endif; ?>
+                        <td><input type="checkbox" name="ids[]" value="<?= htmlspecialchars($user['ID']); ?>"></td>
+                        <td><?= htmlspecialchars($user['ID']); ?></td>
+                        <td><?= htmlspecialchars($user['FirstName']); ?></td>
+                        <td><?= htmlspecialchars($user['LastName']); ?></td>
+                        <td><?= htmlspecialchars($user['MobileNumber']); ?></td>
+                        <td><?= htmlspecialchars($user['Email']); ?></td>
+                        <td><?= htmlspecialchars($user['Address']); ?></td>
+                        <td>
+                            <?php if (!empty($user['ProfilePic'])): ?>
+                                <img src="/uploads/<?= htmlspecialchars($user['ProfilePic']); ?>" alt="Profile Picture" width="50">
+                            <?php else: ?>
+                                No Image
+                            <?php endif; ?>    
                             </td>
                             <td>
                                 <a href="../Views/edit1.php?id=<?php echo $user['ID']; ?>">Edit</a>
@@ -350,9 +365,10 @@ button:disabled {
             </tbody>
         </table>
 
-        <!-- Mass delete button -->
-        <button type="submit" name="mass_delete">Delete Selected</button>
-    </form>
+    <button type="submit" name="mass_delete" onclick="return confirm('Are you sure you want to delete the selected users?');">
+        Delete Selected
+    </button>
+</form>
 
     <div class="pagination">
         <?php if ($page > 1): ?>
@@ -372,13 +388,16 @@ button:disabled {
 </div>
 
 <script>
-    // Select/Deselect all checkboxes
+
     document.getElementById('select-all').addEventListener('change', function() {
-        const checkboxes = document.querySelectorAll('input[name="selected_users[]"]');
-        checkboxes.forEach(checkbox => {
-            checkbox.checked = this.checked;
-        });
+        const checkboxes = document.querySelectorAll('input[name="ids[]"]');
+        checkboxes.forEach(checkbox => checkbox.checked = this.checked);
     });
+
+
 </script>
 
 <?php include 'footer.php'; ?>
+
+
+

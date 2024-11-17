@@ -18,6 +18,9 @@ class User1 {
     }
 
     public function delete1($id) {
+        // echo 'Hello';
+        // print_r($id);
+        // exit;
         $stmt = $this->conn->prepare("DELETE FROM EMPLOYEE WHERE ID = ?");
         $stmt->bind_param("i", $id);
         return $stmt->execute();
@@ -31,17 +34,6 @@ class User1 {
         return $result->fetch_all(MYSQLI_ASSOC); // returns an array
     }
 
-    // Add countUsers method for pagination
-    // public function countUsers($search = '') {
-    //     $search = "%" . $this->conn->real_escape_string($search) . "%"; // Sanitize search input
-    //     $stmt = $this->conn->prepare("SELECT COUNT(*) FROM EMPLOYEE WHERE FirstName LIKE ? OR LastName LIKE ? OR MobileNumber LIKE ? OR Email LIKE ? OR Address LIKE ?");
-    //     // $stmt->bind_param("ss", $search, $search);
-    //     $stmt->bind_param('sssss', $likeSearch, $likeSearch, $likeSearch, $likeSearch, $likeSearch);
-    //     $stmt->execute();
-    //     $stmt->bind_result($count);
-    //     $stmt->fetch();
-    //     return $count; // returns the total number of users
-    // }
 
     public function countUsers($search = '') {
         $search = "%" . $this->conn->real_escape_string($search) . "%";
@@ -52,21 +44,6 @@ class User1 {
         $stmt->fetch();
         return $count;
     }
-
-    // Add fetchUsers method for pagination with search
-    // public function fetchUsers($search = '', $limit = 5, $offset = 0) {
-    //     // echo 'Hello';
-    //     // exit;
-    //     $search = "%" . $this->conn->real_escape_string($search) . "%"; // Sanitize search input
-    //     $stmt = $this->conn->prepare("SELECT * FROM EMPLOYEE WHERE FirstName LIKE ? OR LastName LIKE ? OR MobileNumber LIKE ? OR Email LIKE ? OR Address LIKE ? LIMIT ? OFFSET ?");
-    //     // $stmt->bind_param("ssii", $search, $search, $limit, $offset);
-    //     $stmt->bind_param('ssssiii', $likeSearch, $likeSearch, $likeSearch, $likeSearch, $likeSearch, $limit, $offset);
-    //     $stmt->execute();
-    //     // print_r($stmt);
-    //     // exit;
-    //     $result = $stmt->get_result();
-    //     return $result->fetch_all(MYSQLI_ASSOC); // returns an array of users
-    // }        
 
 
     public function fetchUsers($search = '', $limit = 5, $offset = 0) {
@@ -93,15 +70,6 @@ class User1 {
         return $user;
     }
 
-    public function deleteUser($id) {
-        // Database query to delete the user by ID
-        $sql = "DELETE FROM users WHERE ID = :id";
-        $stmt = $this->db->prepare($sql);
-        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-        $stmt->execute();
-    }
-
-
     public function mobileNumberExists($mobileNumber) {
         // Fix: Access conn through $this->db
         $stmt = $this->conn->prepare("SELECT * FROM EMPLOYEE  WHERE MobileNumber = ?");
@@ -121,6 +89,29 @@ class User1 {
     
     }
 
+    public function deleteById($id) {
+        $conn = new mysqli('localhost', 'root', '12345678', 'MVC_EMPLOYEE');
+        if ($conn->connect_error) {
+            die("Connection failed: " . $conn->connect_error);
+        }
+    
+        $stmt = $conn->prepare("DELETE FROM EMPLOYEE WHERE ID = ?");
+        $stmt->bind_param("i", $id);
+        $result = $stmt->execute();
+    
+        $stmt->close();
+        $conn->close();
+    
+        return $result;
     }
+
+    public function deleteUser($id) {
+        $connection = mysqli_connect('localhost', 'root', '12345678', 'MVC_EMPLOYEE'); 
+        $query = "DELETE FROM EMPLOYEE WHERE ID = " . intval($id);
+        mysqli_query($connection, $query);
+        mysqli_close($connection);
+    }
+
+}
 
 

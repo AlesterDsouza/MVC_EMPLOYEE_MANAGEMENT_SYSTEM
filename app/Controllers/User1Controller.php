@@ -7,13 +7,8 @@ $controller = new User1Controller();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_GET['action']) && $_GET['action'] === 'create1') {
 
-    // echo 'Hello';
-    // exit;
+   
     $controller->createUser($_POST);
-}
-
-if (isset($_GET['action']) && $_GET['action'] === 'delete1') {
-    $controller->deleteUser($_GET['id']);
 }
 
 if (isset($_GET['action']) && $_GET['action'] === 'edit1') {
@@ -25,6 +20,13 @@ if (isset($_GET['action']) && $_GET['action'] === 'importCsv') {
     // echo 'Hello';
     // exit;
     $controller->importCsv();
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_GET['action']) && $_GET['action'] === 'mass_delete') {
+
+    // echo 'Hello';
+    // exit;
+    $controller->massDeleteUsers($_POST['ids'] ?? []);
 }
 
 
@@ -56,25 +58,12 @@ class User1Controller {
         $total_pages = ceil($total_users / $limit);
         $users = $this->user1Model->fetchUsers($search, $limit, $offset);
 
-        //   // Store users in session for the view
-        //   $_SESSION['users'] = $users;
-
         require_once __DIR__ . '/../Views/user_list1.php';
-        
-        // require_once '../app/Views/user_list1.php';
-        // header("Location: ../Views/user_list1.php");
-        // exit();
+    
     }
  
     public function createUser($userData) {
-        // public function createUser($_POST) {
 
-        // echo 'Hello';
-        // exit;
-        // if ($this->user1Model->rollNoExists($userData['RollNo'])) {
-        //     echo "Error: Roll number already exists!";
-        //     return;
-        // }
         if (isset($_POST['submit'])) {
             $firstName = $_POST['FirstName'];
             $lastName = $_POST['LastName'];
@@ -82,34 +71,8 @@ class User1Controller {
             $email = $_POST['Email'];
             $address = $_POST['Address'];
 
-            // $firstName = $userData['FirstName'];
-            // $lastName = $userData['LastName'];
-            // $mobileNumber = $userData['MobileNumber'];
-            // $email = $userData['Email'];
-            // $address = $userData['Address'];
-        
-            // Initialize profile picture variable
             $profilePic = null;
         
-            // // Move uploaded file to uploads directory
-            // if (!empty($_FILES['ProfilePic']['name'])) {
-            //     $profilePic = time() . '_' . $_FILES['ProfilePic']['name'];
-            //     if (!move_uploaded_file($_FILES['ProfilePic']['tmp_name'], 'uploads/' . $profilePic)) {
-            //         echo "<div class='alert alert-danger'>Failed to upload file.</div>";
-            //         die();
-            //     }
-            // }
-
-            // if (!empty($_FILES['ProfilePic']['name'])) {
-            //     $profilePic = time() . '_' . $_FILES['ProfilePic']['name'];
-            //     $uploadPath = __DIR__ . '/../uploads/' . $profilePic;
-            
-            //     if (!move_uploaded_file($_FILES['ProfilePic']['tmp_name'], $uploadPath)) {
-            //         echo "<div class='alert alert-danger'>Failed to upload file.</div>";
-            //         die();
-            //     }
-            // }
-
             $uploadDir = __DIR__ . '/../../uploads/';
 
             // Move uploaded file to uploads directory
@@ -139,122 +102,124 @@ class User1Controller {
         }
     }
 
-
-
-    //     if ($this->user1Model-> mobileNumberExists($userData['MobileNumber'])) {
-    //         echo "Error: Mobile number already exists!";
-    //         return;
-    //     }
-    //     if ($this->user1Model->emailExists($userData['RollNo'])) {
-    //         echo "Error: Email already exists!";
-    //         return;
-    //     }FirstName, LastName, MobileNumber, Email, Address, ProfilePic
-    //     $this->user1Model->create1($userData['FirstName'], $userData['LastName'], $userData['MobileNumber'], $userData['Email'], $userData['Address'], $userData['MobileNumber'],);
-        
-    //     header('Location: ../Views/user_list1.php');
-    // }
-
- 
-    
-        public function deleteUsers($userIds) {
-            $userObj = new User1();
-            foreach ($userIds as $id) {
-                $userObj->deleteUser($id);
-            }
-            header("Location: user_list1.php");
-            exit();
-        }
-    
-    
-
-
-
     public function importCsv() {
-        if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['csv_file'])) {
-            $file = $_FILES['csv_file'];
+        if (isset($_FILES['csv_file']) && $_FILES['csv_file']['error'] === UPLOAD_ERR_OK) {
+            $fileTmpPath = $_FILES['csv_file']['tmp_name'];
+            $fileType = mime_content_type($fileTmpPath);
     
-            // Check file type
-            $fileType = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-            if ($fileType !== 'csv') {
-                $_SESSION['error_message'] = "Invalid file format. Only CSV files are allowed.";
-                header("Location: ../Views/user_list1.php");
-                exit();
+            // Allowed file types
+            $allowedFileType = ['text/csv', 'application/vnd.ms-excel'];
+            if (!in_array($fileType, $allowedFileType)) {
+                $_SESSION['error_message'] = 'Invalid file type. Please upload a CSV file.';
+                header('Location: ../Views/import.php');
+                exit;
             }
     
-           
-            if (($handle = fopen($file['tmp_name'], 'r')) !== false) {
-                // $expectedHeaders = ['ID', 'FirstName', 'LastName', 'RollNo'];
-                $expectedHeaders = ['FirstName', 'LastName', 'MobileNumber','Email', 'Address'];
-                $headerRow = fgetcsv($handle);
+            $fileHandle = fopen($fileTmpPath, 'r');
+            $headers = fgetcsv($fileHandle); // Read header row
     
-           
-                if ($headerRow !== $expectedHeaders) {
-                    $_SESSION['error_message'] = "CSV headers do not match the required table format.";
-                    fclose($handle);
-                    header("Location: ../Views/user_list1.php");
-                    exit();
-                }
-    
-                // Process rows after the header
-                while (($data = fgetcsv($handle)) !== false) {
-                    // $id = $data[0];
-                    // $firstName = $data[1];
-                    // $lastName = $data[2];
-                    // $rollNo = $data[3];
-
-                    $firstName = $data[0];
-                    $lastName = $data[1];
-                    $mobileNumber = $data[2];
-                    $email = $data[3];
-                    $address = $data[4];
-                    // $firstName, $lastName, $mobileNumber, $email, $address, $profilePic
-
-                    // if ($this->user1Model->rollNoExists($rollNo)) {
-
-                    //     $_SESSION['error_message'] = "Roll No exists.";
-                    //     header("Location: ../Views/user_list1.php");
-                       
-                    //     // echo "<div class='alert alert-danger'>Error: Roll number $rollNo already exists! Please use a different one.</div>";
-                    //     // continue;
-                    //     exit();
-                    //     }
-
-                    if ($this->user1Model->mobileNumberExists($mobileNumber)) {
-                        $_SESSION['error_message'] = "Mobile Number exists.";
-                        header("Location: ../Views/user_list1.php");
-                        exit();
-                            //echo "<div class='alert alert-danger'>Mobile number already exists. Please use a different one.</div>";
-                        } elseif ($this->user1Model->emailExists($email)) {
-                            $_SESSION['error_message'] = "Email Address exists.";
-                            header("Location: ../Views/user_list1.php");
-                            exit();
-                            //echo "<div class='alert alert-danger'>Email already exists. Please use a different one.</div>";
-                        } 
-                        //else {
-                        //     $this->user1Model->create1($firstName, $lastName, $mobileNumber, $email, $address, $profilePic);
-                        //     echo "<div class='alert alert-success'>User created successfully!</div>";
-                        //     header('Location: user_list1.php');
-                        //exit();
-                        
-                        
-                        // $this->user1Model->create1($firstName, $lastName, $rollNo);
-                   
-                    $this->user1Model->create1($firstName, $lastName, $mobileNumber, $email, $address, $profilePic);
-                    
-                }
-    
-                fclose($handle);
-                $_SESSION['success_message'] = "CSV file imported successfully.";
-                header("Location: ../Views/user_list1.php");
-                exit();
-            } else {
-                $_SESSION['error_message'] = "Unable to open CSV file.";
-                header("Location: ../Views/user_list1.php");
-                exit();
+            // Verify if headers match the required format
+            $expectedHeaders = ['FirstName', 'LastName', 'MobileNumber', 'Email', 'Address', 'ProfilePic'];
+            if ($headers !== $expectedHeaders) {
+                $_SESSION['error_message'] = 'Invalid CSV headers. Expected: ' . implode(', ', $expectedHeaders);
+                header('Location: ../Views/import.php');
+                exit;
             }
-        
+    
+            $errors = [];
+            $users = [];
+    
+            while (($row = fgetcsv($fileHandle)) !== false) {
+                $firstName = trim($row[0]);
+                $lastName = trim($row[1]);
+                $mobileNumber = trim($row[2]);
+                $email = trim($row[3]);
+                $address = trim($row[4]);
+                $profilePic = trim($row[5]);
+    
+                // Validation
+                if (!preg_match('/^[a-zA-Z ]+$/', $firstName)) {
+                    $errors[] = "Invalid first name: $firstName";
+                    continue;
+                }
+    
+                if (!preg_match('/^[a-zA-Z ]+$/', $lastName)) {
+                    $errors[] = "Invalid last name: $lastName";
+                    continue;
+                }
+    
+                if (!preg_match('/^\d{10}$/', $mobileNumber)) {
+                    $errors[] = "Invalid mobile number: $mobileNumber";
+                    continue;
+                }
+    
+                if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                    $errors[] = "Invalid email address: $email";
+                    continue;
+                }
+    
+                if (empty($address)) {
+                    $errors[] = "Address is required for user: $firstName $lastName";
+                    continue;
+                }
+    
+                if ($this->user1Model->mobileNumberExists($mobileNumber)) {
+                    $errors[] = "Duplicate mobile number: $mobileNumber";
+                    continue;
+                }
+    
+                if ($this->user1Model->emailExists($email)) {
+                    $errors[] = "Duplicate email: $email";
+                    continue;
+                }
+    
+                $uploadDir = __DIR__ . '/../../uploads/';
+                $profilePicPath = $uploadDir . $profilePic;
+                if (!file_exists($profilePicPath)) {
+                    $errors[] = "Profile picture not found: $profilePic";
+                    continue;
+                }
+    
+                $users[] = [
+                    'FirstName' => $firstName,
+                    'LastName' => $lastName,
+                    'MobileNumber' => $mobileNumber,
+                    'Email' => $email,
+                    'Address' => $address,
+                    'ProfilePic' => $profilePic
+                ];
+            }
+    
+            fclose($fileHandle);
+    
+            if (!empty($errors)) {
+                $_SESSION['error_message'] = implode('<br>', $errors);
+                header('Location: ../Views/import.php');
+                exit;
+            }
+    
+            // Insert valid records
+            foreach ($users as $user) {
+                $this->user1Model->create1(
+                    $user['FirstName'],
+                    $user['LastName'],
+                    $user['MobileNumber'],
+                    $user['Email'],
+                    $user['Address'],
+                    $user['ProfilePic']
+                );
+            }
+    
+            $_SESSION['success_message'] = 'CSV file imported successfully!';
+            header('Location: ../Views/user_list1.php');
+            exit;
+        } else {
+            $_SESSION['error_message'] = 'Error uploading CSV file.';
+            header('Location: ../Views/import.php');
+            exit;
         }
     }
+    
 
     public function editUser($id){
         $user = $this->user1Model->find1($id);
@@ -290,15 +255,32 @@ if (isset($_POST['submit'])) {
         echo "<div class='alert alert-danger'>Failed to update user.</div>";
     }
 }
-
-
-        // $this->user1Model->update1($id, $userData['FirstName'], $userData['LastName'], $userData['RollNo']);
-        // header('Location: ../Views/user_list1.php');
-        // // header('Location: ../app/Views/user_list1.php');
     }
 
+
     public function deleteUser($id) {
+
+
         $this->user1Model->delete1($id);
         header('Location: ../Views/user_list1.php');
     }
+
+    public function massDeleteUsers($userIds) {
+
+    //        echo 'Hello';
+    // exit;
+        if (!empty($userIds)) {
+            foreach ($userIds as $id) {
+                $this->user1Model->deleteUser($id);
+            }
+            $_SESSION['success_message'] = "Selected users deleted successfully.";
+        } else {
+            $_SESSION['error_message'] = "No users selected for deletion.";
+        }
+        header("Location: ../Views/user_list1.php");
+        exit();
+    }
+
+
+
 }

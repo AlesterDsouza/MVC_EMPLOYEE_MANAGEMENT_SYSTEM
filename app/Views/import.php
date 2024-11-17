@@ -1,3 +1,8 @@
+<?php
+// Start session for displaying messages
+session_start();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,9 +11,8 @@
     <title>User List</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
-
-         /* General Styles */
-         body {
+        /* General Styles */
+        body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f7f8fa;
             margin: 0;
@@ -209,8 +213,8 @@
             color: white;
             border-radius: 4px;
         }
-        .error-message { background-color: #dc3545; }
-        .success-message { background-color: #28a745; }
+        /* .error-message { background-color: #dc3545; }
+        .success-message { background-color: #28a745; } */
     </style>
 </head>
 <body>
@@ -218,23 +222,39 @@
 <?php include 'header1.php'; ?>
 
 <div class="container">
+    <!-- Display Error or Success Messages -->
+    <?php if (isset($_SESSION['error_message'])): ?>
+        <div class="error-message">
+            <?php 
+            echo $_SESSION['error_message']; 
+            unset($_SESSION['error_message']); // Clear message after displaying
+            ?>
+        </div>
+    <?php endif; ?>
+
+    <?php if (isset($_SESSION['success_message'])): ?>
+        <div class="success-message">
+            <?php 
+            echo $_SESSION['success_message']; 
+            unset($_SESSION['success_message']); // Clear message after displaying
+            ?>
+        </div>
+    <?php endif; ?>
 
     <!-- CSV Upload Section -->
     <div class="csv-upload">
         <h3>Import Users via CSV</h3>
         <form action="../Controllers/User1Controller.php?action=importCsv" method="POST" enctype="multipart/form-data">
             <input type="file" name="csv_file" accept=".csv" required>
-            <button type="submit">Upload CSV</button>
+            <div id="file-error" class="error" style="color: red;"></div>
+            <button type="submit" name="submit">Upload CSV</button>
         </form>
         <br>
         <a href="../Views/sample_data.csv" download>Download Sample CSV</a>
     </div>
-
 </div>
 
 <?php include 'footer1.php'; ?>
 
 </body>
 </html>
-
-
