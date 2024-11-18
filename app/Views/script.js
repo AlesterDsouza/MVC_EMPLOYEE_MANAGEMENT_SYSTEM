@@ -82,34 +82,69 @@ function validateLastName() {
 }
 
 // Validate phone number
+// function validatePhone() {
+
+    //Sample 1:-
+    // var phoneInput = document.getElementById('MobileNumber');
+    // var phone = phoneInput.value;
+
+    // phone = phone.replace(/\D/g, ''); // Remove any non-digit characters
+    // if (phone.length > 10) {
+    //     phone = phone.slice(0, 10); // Limit the input to the first 10 digits
+    // }
+    // phoneInput.value = phone; // Update the input value to exclude extra digits
+
+    // if (phone.length === 0) {
+    //     phoneError.innerHTML = 'Phone number is required';
+    //     phoneError.style.color = 'red';
+    //     phoneError.classList.remove('success');
+    //     phoneError.classList.add('error');
+    //     vPhone = false;
+    // } else if (phone.length !== 10) {
+    //     phoneError.innerHTML = 'Phone number must be exactly 10 digits';
+    //     phoneError.style.color = 'red';
+    //     phoneError.classList.remove('success');
+    //     phoneError.classList.add('error');
+    //     vPhone = false;
+    // } else {
+    //     phoneError.innerHTML = 'Valid Phone Number';
+    //     phoneError.style.color = 'green';
+    //     phoneError.classList.remove('error');
+    //     phoneError.classList.add('success');
+    //     vPhone = true;
+    // }
+
+    //Sample 2:-
+//     const phoneInput = document.getElementById('MobileNumber').value; 
+//     const regex = /^(?:\+91[-\s]?)?[789]\d{9}$/; 
+ 
+//     if (regex.test(phoneInput)) { 
+//         document.getElementById('message').textContent = "Valid phone number9999!"; 
+//         document.getElementById('message').style.color = "green"; 
+//         vPhone = true;
+//                 // Here you can proceed with form submission if needed 
+//     } else { 
+//         document.getElementById('message').textContent = "Invalid phone number! Please enter a valid 10-digit mobile number starting with 7, 8, or 9."; 
+//         document.getElementById('message').style.color = "red"; 
+//         vPhone = false;
+//         } 
+
+//     checkSubmitButton();
+// }
+
 function validatePhone() {
-    var phoneInput = document.getElementById('MobileNumber');
-    var phone = phoneInput.value;
+    const phoneInput = document.getElementById('MobileNumber').value;
+    const regex = /^[6-9]\d{9}$/;
+    const phoneError = document.getElementById('phone-error');
 
-    phone = phone.replace(/\D/g, ''); // Remove any non-digit characters
-    if (phone.length > 10) {
-        phone = phone.slice(0, 10); // Limit the input to the first 10 digits
-    }
-    phoneInput.value = phone; // Update the input value to exclude extra digits
-
-    if (phone.length === 0) {
-        phoneError.innerHTML = 'Phone number is required';
-        phoneError.style.color = 'red';
-        phoneError.classList.remove('success');
-        phoneError.classList.add('error');
-        vPhone = false;
-    } else if (phone.length !== 10) {
-        phoneError.innerHTML = 'Phone number must be exactly 10 digits';
-        phoneError.style.color = 'red';
-        phoneError.classList.remove('success');
-        phoneError.classList.add('error');
-        vPhone = false;
+    if (!regex.test(phoneInput)) {
+        phoneError.innerHTML = "Invalid phone number! Please enter a valid 10-digit Indian mobile number starting with 6, 7, 8, or 9.";
+        phoneError.style.color = "red";
+        vPhone = false;  
     } else {
-        phoneError.innerHTML = 'Valid Phone Number';
-        phoneError.style.color = 'green';
-        phoneError.classList.remove('error');
-        phoneError.classList.add('success');
-        vPhone = true;
+        phoneError.innerHTML = "Valid phone number.";
+        phoneError.style.color = "green";
+        vPhone = true;  
     }
     checkSubmitButton();
 }

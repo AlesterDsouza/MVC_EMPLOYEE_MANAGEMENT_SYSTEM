@@ -43,6 +43,16 @@ $users = $userObj->fetchUsers($search, $limit, $offset);
         </div>
     <?php endif; ?>
 
+    <!-- <div class="sidenav">
+  <a href="user_list1.php">Home</a>
+  <a href="import.php">Import</a>
+</div> -->
+
+<!-- <div class="sidebar">
+  <a class="user_list1.php" href="">Home</a>
+  <a href="import.php">Import</a>
+</div>
+ -->
 
     <form method="GET" action="">
         <input type="text" name="search" value="<?php echo htmlspecialchars($search); ?>" placeholder="Search" autocomplete="off">
@@ -313,6 +323,12 @@ button:disabled {
 } 
 </style>
 
+<!-- <div class="sidenav">
+  <a href="user_list1.php">Home</a>
+  <a href="import.php">Import</a>
+</div> -->
+
+
     <a href="create1.php" class="btn">Create User</a>
     <a href="../../public/index.php" class="btn">Logout</a>
 
@@ -365,7 +381,7 @@ button:disabled {
             </tbody>
         </table>
 
-    <button type="submit" name="mass_delete" onclick="return confirm('Are you sure you want to delete the selected users?');">
+    <button type="submit" name="mass_delete"  id="delete-selected-btn" disabled onclick="return confirm('Are you sure you want to delete the selected users?');">
         Delete Selected
     </button>
 </form>
@@ -387,7 +403,7 @@ button:disabled {
     </div>
 </div>
 
-<script>
+<!-- <script>
 
     document.getElementById('select-all').addEventListener('change', function() {
         const checkboxes = document.querySelectorAll('input[name="ids[]"]');
@@ -395,6 +411,28 @@ button:disabled {
     });
 
 
+</script> -->
+
+<script>
+    const selectAllCheckbox = document.getElementById('select-all');
+    const checkboxes = document.querySelectorAll('input[name="ids[]"]');
+    const deleteButton = document.getElementById('delete-selected-btn');
+
+    function toggleDeleteButton() {
+        const isChecked = Array.from(checkboxes).some(checkbox => checkbox.checked);
+        deleteButton.disabled = !isChecked;
+    }
+
+    selectAllCheckbox.addEventListener('change', function () {
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = this.checked;
+        });
+        toggleDeleteButton();
+    });
+
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', toggleDeleteButton);
+    });
 </script>
 
 <?php include 'footer.php'; ?>

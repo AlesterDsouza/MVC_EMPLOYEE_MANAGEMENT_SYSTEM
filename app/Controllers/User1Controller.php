@@ -148,7 +148,7 @@ class User1Controller {
                     continue;
                 }
     
-                if (!preg_match('/^\d{10}$/', $mobileNumber)) {
+                if (!preg_match('/^[6-9]\d{9}$/', $mobileNumber)) {
                     $errors[] = "Invalid mobile number: $mobileNumber";
                     continue;
                 }

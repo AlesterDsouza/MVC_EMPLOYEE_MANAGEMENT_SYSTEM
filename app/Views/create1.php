@@ -32,6 +32,13 @@ if (isset($_POST['submit'])) {
         }
     }
 
+    // Validate Indian mobile number (starts with 6-9 and is 10 digits long)
+    if (!preg_match('/^[6-9]\d{9}$/', $mobileNumber)) {
+            echo "<div class='alert alert-danger'>Invalid mobile number! Please enter a valid 10-digit Indian mobile number starting with 6, 7, 8, or 9.</div>";
+            die();
+    }
+    
+
     // if (!move_uploaded_file($_FILES['ProfilePic']['tmp_name'], __DIR__ . '/../uploads/' . $profilePic)) {
 
 
@@ -123,10 +130,10 @@ $existingImage = false;
         </form>
     </div>
 </div>
-
+<!-- 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
-<script src="script.js" defer></script>
+<script src="script.js" defer></script> -->
 <script>
 
 
@@ -213,34 +220,41 @@ function validateLastName() {
 }
 
 // Validate phone number
+// function validatePhone() {
+
+//     var phoneInput = document.getElementById('MobileNumber').value; 
+//     // const regex = /^(?:\+91[-\s]?)?[789]\d{9}$/; 
+//     const regex = ^[6-9]\d{9}$;
+ 
+//     if (regex.test(phoneInput)) { 
+//         phoneError.innerHTML = "Valid phone number111!"; 
+//         phoneError.style.color = "green"; 
+//                 // Here you can proceed with form submission if needed 
+//         vPhone = true;        
+//     } else { 
+//         phoneError.innerHTML = "Invalid phone number! Please enter a valid 10-digit mobile number starting with 7, 8, or 9."; 
+//         phoneError.style.color = "red";
+//         vPhone = false; 
+//         } 
+
+
+//     checkSubmitButton();
+// }
+
+
 function validatePhone() {
-    var phoneInput = document.getElementById('MobileNumber');
-    var phone = phoneInput.value;
+    const phoneInput = document.getElementById('MobileNumber').value;
+    const regex = /^[6-9]\d{9}$/;
+    const phoneError = document.getElementById('phone-error');
 
-    phone = phone.replace(/\D/g, ''); // Remove any non-digit characters
-    if (phone.length > 10) {
-        phone = phone.slice(0, 10); // Limit the input to the first 10 digits
-    }
-    phoneInput.value = phone; // Update the input value to exclude extra digits
-
-    if (phone.length === 0) {
-        phoneError.innerHTML = 'Phone number is required';
-        phoneError.style.color = 'red';
-        phoneError.classList.remove('success');
-        phoneError.classList.add('error');
-        vPhone = false;
-    } else if (phone.length !== 10) {
-        phoneError.innerHTML = 'Phone number must be exactly 10 digits';
-        phoneError.style.color = 'red';
-        phoneError.classList.remove('success');
-        phoneError.classList.add('error');
-        vPhone = false;
+    if (!regex.test(phoneInput)) {
+        phoneError.innerHTML = "Invalid phone number! Please enter a valid 10-digit Indian mobile number starting with 6, 7, 8, or 9.";
+        phoneError.style.color = "red";
+        vPhone = false;  
     } else {
-        phoneError.innerHTML = 'Valid Phone Number';
-        phoneError.style.color = 'green';
-        phoneError.classList.remove('error');
-        phoneError.classList.add('success');
-        vPhone = true;
+        phoneError.innerHTML = "Valid phone number.";
+        phoneError.style.color = "green";
+        vPhone = true;  
     }
     checkSubmitButton();
 }
@@ -314,11 +328,13 @@ function validateImage() {
     if (file) {
         if (!allowedTypes.includes(file.type)) {
             imageError.innerHTML = 'Only .jpg and .png files are allowed';
+            imageError.style.color= 'red';
             imageError.classList.remove('success');
             imageError.classList.add('error');
             vImage = false;
         }else if (file.size > 5 * 1024 * 1024) { // 5MB limit
             imageError.innerHTML = 'Image size must not exceed 5MB';
+            imageError.style.color= 'red';
             imageError.classList.remove('success');
             imageError.classList.add('error');
             vImage = false;
