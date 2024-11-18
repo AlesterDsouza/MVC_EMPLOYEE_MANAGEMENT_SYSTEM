@@ -43,17 +43,6 @@ $users = $userObj->fetchUsers($search, $limit, $offset);
         </div>
     <?php endif; ?>
 
-    <!-- <div class="sidenav">
-  <a href="user_list1.php">Home</a>
-  <a href="import.php">Import</a>
-</div> -->
-
-<!-- <div class="sidebar">
-  <a class="user_list1.php" href="">Home</a>
-  <a href="import.php">Import</a>
-</div>
- -->
-
     <form method="GET" action="">
         <input type="text" name="search" value="<?php echo htmlspecialchars($search); ?>" placeholder="Search" autocomplete="off">
         <button type="submit">Search</button>
@@ -321,6 +310,11 @@ button:disabled {
     color: green;
     font-weight: bold;
 } 
+
+.delete_checkbox{
+    display:none;
+}
+
 </style>
 
 <!-- <div class="sidenav">
@@ -381,7 +375,7 @@ button:disabled {
             </tbody>
         </table>
 
-    <button type="submit" name="mass_delete"  id="delete-selected-btn" disabled onclick="return confirm('Are you sure you want to delete the selected users?');">
+    <button type="submit" name="mass_delete"  class = "delete_checkbox" id="delete-selected-btn" onclick="return confirm('Are you sure you want to delete the selected users?');">
         Delete Selected
     </button>
 </form>
@@ -420,7 +414,17 @@ button:disabled {
 
     function toggleDeleteButton() {
         const isChecked = Array.from(checkboxes).some(checkbox => checkbox.checked);
-        deleteButton.disabled = !isChecked;
+        // deleteButton.disabled = !isChecked;
+        if(isChecked){
+        deleteButton.style.display = "block";
+        }
+        else{
+            deleteButton.style.display = "none";
+        }
+        // if(deleteButton.style.display ===  "none")
+        // {
+        //     deleteButton.style.display = "block";
+        // }
     }
 
     selectAllCheckbox.addEventListener('change', function () {

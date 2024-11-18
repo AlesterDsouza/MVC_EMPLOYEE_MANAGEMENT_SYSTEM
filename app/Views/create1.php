@@ -32,11 +32,45 @@ if (isset($_POST['submit'])) {
         }
     }
 
-    // Validate Indian mobile number (starts with 6-9 and is 10 digits long)
-    if (!preg_match('/^[6-9]\d{9}$/', $mobileNumber)) {
-            echo "<div class='alert alert-danger'>Invalid mobile number! Please enter a valid 10-digit Indian mobile number starting with 6, 7, 8, or 9.</div>";
-            die();
+       // Remove "+91" and extract the 10-digit mobile number
+       if (strpos($mobileNumber, '+91') === 0) {
+        $mobileNumber = substr($mobileNumber, 3); // Extract digits after "+91"
     }
+
+    // Validate the 10-digit mobile number
+    if (!preg_match('/^[6-9]\d{9}$/', $mobileNumber)) {
+        echo "<div class='alert alert-danger'>Invalid mobile number! Please enter a valid 10-digit Indian mobile number starting with 6, 7, 8, or 9.</div>";
+        die();
+    }
+
+    // function restrictMobileNumberInput(event) {
+    //     const input = event.target;
+    //     const value = input.value;
+    
+    //     // Ensure it always starts with "+91"
+    //     if (!value.startsWith("+91")) {
+    //         input.value = "+91";
+    //     }
+    
+    //     // Allow only numbers after "+91"
+    //     input.value = value.replace(/[^+0-9]/g, "").replace(/(\+91)(.*?)([^0-9].*)/, "$1$2");
+    //     validatePhone(); // Trigger validation
+    // }
+    
+
+// $mobileNumber = preg_replace('/^\+91/', '', $mobileNumber);
+
+// Validate Indian mobile number (10 digits starting with 6-9)
+// if (!preg_match('/^[6-9]\d{9}$/', $mobileNumber)) {
+//   echo "<div class='alert alert-danger'>Invalid mobile number! Please enter a valid 10-digit Indian mobile number starting with 6, 7, 8, or 9.</div>";
+//   die();
+// }
+
+    // // Validate Indian mobile number (starts with 6-9 and is 10 digits long)
+    // if (!preg_match('/^[6-9]\d{9}$/', $mobileNumber)) {
+    //         echo "<div class='alert alert-danger'>Invalid mobile number! Please enter a valid 10-digit Indian mobile number starting with 6, 7, 8, or 9.</div>";
+    //         die();
+    // }
     
 
     // if (!move_uploaded_file($_FILES['ProfilePic']['tmp_name'], __DIR__ . '/../uploads/' . $profilePic)) {
@@ -82,7 +116,13 @@ $existingImage = false;
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create User</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css"> 
+    <!-- <style>
+        .intl-tel-input,
+.iti{
+  width: 100%;
+} -->
+<!-- </style> -->
 </head>
 <body onload="validateAllFields()">
 <div class="container">
@@ -104,9 +144,32 @@ $existingImage = false;
 
             <div class="form-group">
                 <label for="MobileNumber">Mobile Number</label>
-                <input type="text" class="form-control" id="MobileNumber" name="MobileNumber" required>
+                <input type="text" class="form-control" id="MobileNumber" placeholder= "+91" name="MobileNumber" maxlength="10" required>
                 <div id="phone-error" class="error-message"></div>
             </div>
+
+            <!-- <select id="country">
+   <option value="">Select Country</option>
+   <option value="1">US</select>
+   <option value="91">IN</select>
+</select><br/>
+<input type="text" class="form-control" id="MobileNumber" placeholder= "+91" name="MobileNumber" required> -->
+
+            <!-- <div class="form-group">
+  <label for="MobileNumber">Mobile Number</label>
+  <input 
+    type="text" 
+    class="form-control" 
+    id="MobileNumber" 
+    name="MobileNumber" 
+    value="+91" 
+    required 
+    onfocus="setCaretPosition(this, 3)"
+    oninput="restrictMobileNumberInput(event)">
+  <div id="phone-error" class="error-message"></div>
+</div> -->
+
+
 
             <div class="form-group">
                 <label for="Email">Email</label>
@@ -135,6 +198,13 @@ $existingImage = false;
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="script.js" defer></script> -->
 <script>
+
+// -----Country Code Selection
+// $("#MobileNumber").intlTelInput({
+// 	initialCountry: "in",
+// 	separateDialCode: true,
+// 	// utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/11.0.4/js/utils.js"
+// });    
 
 
 var nameError = document.getElementById('name-error');
@@ -245,6 +315,7 @@ function validateLastName() {
 function validatePhone() {
     const phoneInput = document.getElementById('MobileNumber').value;
     const regex = /^[6-9]\d{9}$/;
+    // const regex = /^((\+91?)|\+)?[7-9][0-9]{9}$/;
     const phoneError = document.getElementById('phone-error');
 
     if (!regex.test(phoneInput)) {
